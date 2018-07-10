@@ -1,10 +1,15 @@
+'''
+Modified by Xin Yao (https://github.com/susurrant)
+1. 10th Jul. 2018: add comments, make codes more structured
+'''
+
 import argparse
-import random
+import sys
+sys.path.append('./optimization')
 
 import tensorflow as tf
 from optimization.optimize import build_tensorflow
 from common import settings_reader, io, model_builder, optimizer_parameter_parser, evaluation, auxilliaries
-from model import Model
 import numpy as np
 
 parser = argparse.ArgumentParser(description="Train a model on a given dataset.")
@@ -16,11 +21,9 @@ settings = settings_reader.read(args.settings)
 print(settings)
 
 
-
 '''
-Load datasets:
+1. Load datasets
 '''
-
 dataset = args.dataset
 
 relations_path = dataset + '/relations.dict'
@@ -47,25 +50,10 @@ test_triplets = np.array(test_triplets)
 entities = io.read_dictionary(entities_path)
 relations = io.read_dictionary(relations_path)
 
-'''
-shuffled_rels = np.arange(len(relations))
-np.random.shuffle(shuffled_rels)
-
-known_rels = shuffled_rels[:int(len(relations)/2)]
-target_rels = shuffled_rels[int(len(relations)/2):]
-
-known_train = train_triplets[np.where(np.in1d(train_triplets[:,1], known_rels))]
-target_train = train_triplets[np.where(np.in1d(train_triplets[:,1], target_rels))]
-known_valid = valid_triplets[np.where(np.in1d(valid_triplets[:,1], known_rels))]
-target_valid = valid_triplets[np.where(np.in1d(valid_triplets[:,1], target_rels))]
-known_test = test_triplets[np.where(np.in1d(test_triplets[:,1], known_rels))]
-target_test = test_triplets[np.where(np.in1d(test_triplets[:,1], target_rels))]
-'''
 
 '''
-Load general settings
+2. Load general settings
 '''
-
 encoder_settings = settings['Encoder']
 decoder_settings = settings['Decoder']
 shared_settings = settings['Shared']
@@ -87,15 +75,15 @@ evaluation_settings.merge(general_settings)
 
 
 '''
-Construct the encoder-decoder pair:
+3. Construct the encoder-decoder pair:
 '''
 encoder = model_builder.build_encoder(encoder_settings, train_triplets)
 model = model_builder.build_decoder(encoder, decoder_settings)
 
-'''
-Construct the optimizer with validation MRR as early stopping metric:
-'''
 
+'''
+4. Construct the optimizer with validation MRR as early stopping metric:
+'''
 opp = optimizer_parameter_parser.Parser(optimizer_settings)
 opp.set_save_function(model.save)
 
@@ -276,9 +264,10 @@ Train with Converge:
 '''
 
 model.session = tf.Session()
+print('build tensorflow...')
 optimizer = build_tensorflow(loss, optimizer_weights, optimizer_parameters, optimizer_input)
 optimizer.set_session(model.session)
-
+print('fit...')
 optimizer.fit(train_triplets, validation_data=valid_triplets)
 #scorer.dump_all_scores(valid_triplets, 'dumps/subjects.valid', 'dumps/objects.valid')
 #scorer.dump_all_scores(test_triplets, 'dumps/subjects.test', 'dumps/objects.test')

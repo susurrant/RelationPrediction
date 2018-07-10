@@ -25,7 +25,7 @@ class Optimizer():
 
         i = 0
         next_batch = self.stack.next_batch()
-        while(next_batch is not None):
+        while next_batch is not None:
             i+=1
             self.stack.set_iteration(i)
 

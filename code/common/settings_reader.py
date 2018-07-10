@@ -1,6 +1,9 @@
-class Settings():
+'''
+Modified by Xin Yao (https://github.com/susurrant)
+1. 10th Jul. 2018: Settings can ignore comments (with # marked) in the setting file
+'''
 
-    
+class Settings():
     def __init__(self):
         self.__dict__ = {}
 
@@ -43,14 +46,12 @@ class Settings():
                     line = line[1:-1]
                     self.__dict__[line] = Settings()
                     self.__dict__[line].internal_parse(lines[i+1:], indent=indent+1)
-                else:
+                elif not line.startswith('#'):
                     parts = [p.strip() for p in line.split('=')]
                     self.__dict__[parts[0]] = parts[1]
 
-                
-
-
-    def __count_indents__(self, line):
+    @staticmethod
+    def __count_indents__(line):
         for i,c in enumerate(line):
             if c != '\t':
                 return i
