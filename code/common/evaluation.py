@@ -1,3 +1,8 @@
+'''
+Modified by Xin Yao (https://github.com/susurrant)
+1. 11th Jul. 2018: add comments on function hierarchy
+'''
+
 import numpy as np
 import math
 
@@ -277,7 +282,7 @@ class Scorer():
             self.in_degree[obj] += 1
             self.out_degree[sub] += 1
 
-    def register_model(self, model):
+    def register_model(self, model):  #--- model_builder.build_decoder
         self.model = model
 
     def finalize_frequency_computation(self, triples):
@@ -351,6 +356,7 @@ class Scorer():
             print("Evaluating subjects...")
             i = 1
 
+        # --- model.score_all_subjects -> decoders.bilinear_dial.BilinearDiag -- affine_transform.get_all_codes
         pred_s = self.model.score_all_subjects(triples)
         for evaluations, triplet in zip(pred_s, triples):
             if verbose:
